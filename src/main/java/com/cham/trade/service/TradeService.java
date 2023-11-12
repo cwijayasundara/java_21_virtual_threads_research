@@ -27,7 +27,7 @@ public class TradeService {
         for (int i = 1; i < tradeCount + 1; i++) {
             Trade trade = getTrade(i);
             Future<?> future = executor.submit(() -> redisTradeRepository.save(trade));
-            future.get();
+//            future.get();
         }
         executor.shutdown();
     }
@@ -38,6 +38,14 @@ public class TradeService {
             Trade trade = getTrade(i);
             Thread thread = Thread.ofVirtual().start(() -> redisTradeRepository.save(trade));
             thread.join();
+        }
+    }
+
+    public void publishTradesUsingPlainSpring(int tradeCount ) {
+        log.info("Inside TradeService.publishTradesUsingPlainSpring()");
+        for (int i = 1; i < tradeCount + 1; i++) {
+            Trade trade = getTrade(i);
+            redisTradeRepository.save(trade);
         }
     }
 

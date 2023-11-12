@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 public class TradeApplication  implements CommandLineRunner {
 	@Autowired
 	private TradeService tradeService;
-	private final int TRADE_COUNT = 100000;
+	private final int TRADE_COUNT = 10000000;
 
 	private final long NANO_SECONDS = 5_000_000_000L;
 	private final long THREAD_WAIT_TIME = 120000;
@@ -28,6 +28,9 @@ public class TradeApplication  implements CommandLineRunner {
 //		run this one at a time
 		publishTradeUsingNewVirtualThreadPerTaskExecutor();
 //		publishTradeUsingSeparateVirtualThreads();
+//		publishTradesUsingblockingCall();
+//		tradeService.removeAllRecords();
+//		findTradeListSizeInRedis();
 	}
 
 	private void publishTradeUsingNewVirtualThreadPerTaskExecutor() throws InterruptedException, ExecutionException {
@@ -49,6 +52,16 @@ public class TradeApplication  implements CommandLineRunner {
 		double elipsedTime = (double)(endTime - startTime) / NANO_SECONDS;
 		log.info("Time taken to persist " + TRADE_COUNT + " trades is " + elipsedTime + " seconds using " +
 				"Thread.ofVirtual().start()");
+		cleanUp();
+	}
+
+	private void publishTradesUsingblockingCall() throws InterruptedException {
+		log.info("Inside TradeApplication.publishTradesUsingblockingCall()");
+		long startTime = System.nanoTime();
+		tradeService.publishTradesUsingPlainSpring(TRADE_COUNT);
+		long endTime   = System.nanoTime();
+		double elipsedTime = (double)(endTime - startTime) / NANO_SECONDS;
+		log.info("Time taken to persist " + TRADE_COUNT + " trades is " + elipsedTime + " seconds using blocking call");
 		cleanUp();
 	}
 
